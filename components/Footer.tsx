@@ -4,11 +4,6 @@ import { Separator } from "./ui/separator";
 
 export default function Page() {
   const WHATSAPP_NUMBER = "59898976924";
-  const WHATSAPP_TEXT =
-    "Hola, me gustaría consultar disponibilidad y precios de Cabañas Parada 8. ¿Me podrás informar? Gracias.";
-  const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-    WHATSAPP_TEXT,
-  )}`;
 
   return (
     <footer className="border-t bg-white">
