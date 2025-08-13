@@ -1,4 +1,3 @@
-import Contacto from "@/components/Contacto";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 import Nav from "@/components/Nav";
@@ -6,6 +5,7 @@ import NuestrasCabanas from "@/components/NuestrasCabanas";
 import Servicios from "@/components/Servicios";
 import SobreNosotros from "@/components/SobreNosotros";
 import Ubicacion from "@/components/Ubicacion";
+import Rerservas from "@/components/Reservas";
 
 export default function Page() {
   return (
@@ -15,8 +15,8 @@ export default function Page() {
       <SobreNosotros />
       <NuestrasCabanas />
       <Servicios />
+      <Rerservas />
       <Ubicacion />
-      <Contacto />
       <Footer />
     </>
   );
