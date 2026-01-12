@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Cabañas Parada 8",
-  description: "Cabañas Parada 8",
+  title: "Alquileres en Barra del Chuy - Cabañas Parada 8",
+  description:
+    "Alquiler de cabañas en Barra del Chuy, Uruguay. Ideal para familias y parejas. Consultá disponibilidad y precios por WhatsApp. Cabañas Parada 8.",
 };
 
 export default function RootLayout({
@@ -23,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
