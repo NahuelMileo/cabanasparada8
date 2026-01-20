@@ -3,7 +3,7 @@ import { MapPin, ChevronRight, Wifi, Car, Flame } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import Image from "next/image";
-import foto from "../public/hero.png"; // Adjust the path as necessary
+import foto from "../public/patio/1.webp";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 const WHATSAPP_NUMBER = "59898976924";
@@ -43,12 +43,8 @@ export default function Page() {
             priority
           />
         </motion.div>
-        {/* Softer, beachy overlay */}
-        {/* <div className="absolute inset-0 bg-gradient-to-r from-cyan-900/60 via-cyan-900/30 to-transparent" /> */}
-        {/* Ambient glow */}
-        {/* <div className="pointer-events-none absolute -right-20 top-10 h-72 w-72 rounded-full bg-cyan-300/20 blur-3xl md:-right-10 md:top-20" /> */}
+        <div className="absolute inset-0 bg-black/60" />
 
-        {/* Content */}
         <div className="absolute inset-0 flex items-center">
           <div className="container mx-auto px-4">
             <motion.div

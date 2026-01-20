@@ -51,11 +51,11 @@ const cabanas: Cabin[] = [
     capacidad: "2 personas",
     portada: img("apartamento", "sala_2.webp"),
     imagenes: [
-      img("blanca", "sala.webp"),
-      img("blanca", "sala_2.webp"),
-      img("blanca", "cocina.webp"),
-      img("blanca", "dormitorio.webp"),
-      img("blanca", "bano.webp"),
+      img("apartamento", "sala.webp"),
+      img("apartamento", "sala_2.webp"),
+      img("apartamento", "cocina.webp"),
+      img("apartamento", "dormitorio.webp"),
+      img("apartamento", "bano.webp"),
     ],
     comodidades: ["Sommier", "Aire acondicionado", "Smart TV", "Wifi"],
   },
@@ -173,7 +173,7 @@ function CabanaCard({ cabana }: { cabana: Cabin }) {
           </ul>
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <GalleryDialog
-              title={`Cabaña ${cabana.nombre}`}
+              title={`${cabana.nombre}`}
               images={cabana.imagenes}
               trigger={<Button className="w-full">Ver fotos</Button>}
             />
