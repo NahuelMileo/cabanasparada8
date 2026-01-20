@@ -55,7 +55,7 @@ export default function Page() {
     parrillero: { icon: Flame, label: "Parrillero" },
     mascotas: { icon: Dog, label: "Se aceptan mascotas" },
   };
-  const generalAmenities = () => [
+  const generalAmenities = [
     ComodidadIcon.sommier,
     ComodidadIcon.aire,
     ComodidadIcon.cocina,
@@ -65,7 +65,7 @@ export default function Page() {
     ComodidadIcon.juegos,
   ];
 
-  const serviciosIncluidos = () => [
+  const serviciosIncluidos = [
     ComodidadIcon.estacionamiento,
     ComodidadIcon.parrillero,
     { icon: Tv, label: "Cable + Netflix" },
