@@ -1,5 +1,5 @@
 "use client";
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
 import { Button } from "./ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
 import {

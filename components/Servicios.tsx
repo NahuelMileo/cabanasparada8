@@ -10,7 +10,6 @@ import {
   Utensils,
   Wifi,
 } from "lucide-react";
-import { useMemo } from "react";
 import { Card, CardContent } from "./ui/card";
 import { motion } from "framer-motion";
 
@@ -56,27 +55,21 @@ export default function Page() {
     parrillero: { icon: Flame, label: "Parrillero" },
     mascotas: { icon: Dog, label: "Se aceptan mascotas" },
   };
-  const generalAmenities = useMemo(
-    () => [
-      ComodidadIcon.sommier,
-      ComodidadIcon.aire,
-      ComodidadIcon.cocina,
-      { icon: Utensils, label: "Microondas" },
-      ComodidadIcon.tv,
-      ComodidadIcon.wifi,
-      ComodidadIcon.juegos,
-    ],
-    [],
-  );
+  const generalAmenities = () => [
+    ComodidadIcon.sommier,
+    ComodidadIcon.aire,
+    ComodidadIcon.cocina,
+    { icon: Utensils, label: "Microondas" },
+    ComodidadIcon.tv,
+    ComodidadIcon.wifi,
+    ComodidadIcon.juegos,
+  ];
 
-  const serviciosIncluidos = useMemo(
-    () => [
-      ComodidadIcon.estacionamiento,
-      ComodidadIcon.parrillero,
-      { icon: Tv, label: "Cable + Netflix" },
-    ],
-    [],
-  );
+  const serviciosIncluidos = () => [
+    ComodidadIcon.estacionamiento,
+    ComodidadIcon.parrillero,
+    { icon: Tv, label: "Cable + Netflix" },
+  ];
 
   return (
     <motion.section
