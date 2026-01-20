@@ -13,8 +13,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import React from "react";
 
-import foto from "../public/hero.jpg"; // Adjust the path as necessary
-
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
   animate: { opacity: 1, y: 0 },
@@ -39,18 +37,77 @@ type Cabin = {
   id: string;
   nombre: string;
   capacidad: string;
-  portada: StaticImageData;
-  imagenes: StaticImageData[];
+  portada: string;
+  imagenes: string[];
   comodidades: string[];
 };
 
+const img = (cab: string, file: string) => `/${cab}/${file}`;
+
 const cabanas: Cabin[] = [
+  {
+    id: "apartamento",
+    nombre: "Apartamento",
+    capacidad: "2 personas",
+    portada: img("apartamento", "sala_2.webp"),
+    imagenes: [
+      img("blanca", "sala.webp"),
+      img("blanca", "sala_2.webp"),
+      img("blanca", "cocina.webp"),
+      img("blanca", "dormitorio.webp"),
+      img("blanca", "bano.webp"),
+    ],
+    comodidades: ["Sommier", "Aire acondicionado", "Smart TV", "Wifi"],
+  },
+  {
+    id: "bordo",
+    nombre: "Casa Bordó",
+    capacidad: "4 personas",
+    portada: img("bordo", "sala.webp"),
+    imagenes: [
+      img("bordo", "sala.webp"),
+      img("bordo", "sala_2.webp"),
+      img("bordo", "sala_3.webp"),
+      img("bordo", "cocina.webp"),
+      img("bordo", "cocina_2.webp"),
+      img("bordo", "dormitorio.webp"),
+      img("bordo", "dormitorio_2.webp"),
+      img("bordo", "bano.webp"),
+      img("bordo", "bano_2.webp"),
+    ],
+    comodidades: ["Sommier", "Aire acondicionado", "Parrillero", "Wifi"],
+  },
+  {
+    id: "blanca",
+    nombre: "Casa Blanca",
+    capacidad: "4 personas",
+    portada: img("blanca", "parrilla.webp"),
+    imagenes: [
+      img("blanca", "sala.webp"),
+      img("blanca", "cocina.webp"),
+      img("blanca", "dormitorio.webp"),
+      img("blanca", "cuarto.webp"),
+      img("blanca", "bano.webp"),
+      img("blanca", "parrilla.webp"),
+      img("blanca", "estacionamiento.webp"),
+    ],
+    comodidades: ["Sommier", "Aire acondicionado", "Smart TV", "Wifi"],
+  },
   {
     id: "calle",
     nombre: "Calle",
     capacidad: "4-6 personas",
-    portada: foto,
-    imagenes: [foto, foto, foto],
+    portada: img("calle", "afuera.webp"),
+    imagenes: [
+      img("calle", "sala.webp"),
+      img("calle", "sala_2.webp"),
+      img("calle", "cocina.webp"),
+      img("calle", "parrilla.webp"),
+      img("calle", "dormitorio.webp"),
+      img("calle", "dormitorio_2.webp"),
+      img("calle", "cuarto.webp"),
+      img("calle", "bano.webp"),
+    ],
     comodidades: [
       "Hasta 6 huéspedes",
       "Aire acondicionado",
@@ -62,25 +119,17 @@ const cabanas: Cabin[] = [
     id: "medio",
     nombre: "Medio",
     capacidad: "4-6 personas",
-    portada: foto,
-    imagenes: [foto, foto, foto, foto],
+    portada: img("medio", "sala.webp"),
+    imagenes: [
+      img("medio", "sala.webp"),
+      img("medio", "cocina.webp"),
+      img("medio", "comedor.webp"),
+      img("medio", "dormitorio.webp"),
+      img("medio", "dormitorio_2.webp"),
+      img("medio", "cuarto.webp"),
+      img("medio", "bano.webp"),
+    ],
     comodidades: ["Hasta 6 huéspedes", "Smart TV", "Cocina equipada", "Wifi"],
-  },
-  {
-    id: "bordo",
-    nombre: "Casa Bordó",
-    capacidad: "4 personas",
-    portada: foto,
-    imagenes: [foto, foto],
-    comodidades: ["Sommier", "Aire acondicionado", "Parrillero", "Wifi"],
-  },
-  {
-    id: "blanca",
-    nombre: "Casa Blanca",
-    capacidad: "4 personas",
-    portada: foto,
-    imagenes: [foto, foto, foto],
-    comodidades: ["Sommier", "Aire acondicionado", "Smart TV", "Wifi"],
   },
 ];
 
@@ -98,8 +147,8 @@ function CabanaCard({ cabana }: { cabana: Cabin }) {
           transition={{ duration: 0.6 }}
         >
           <Image
-            src={foto || "/placeholder.svg"}
-            alt={`Cabaña ${cabana.nombre} - exterior`}
+            src={cabana.portada}
+            alt={`${cabana.nombre} - exterior`}
             fill
             className="object-cover"
             sizes="(max-width: 640px) 100vw, 50vw"
@@ -107,7 +156,7 @@ function CabanaCard({ cabana }: { cabana: Cabin }) {
         </motion.div>
         <CardHeader className="space-y-1">
           <CardTitle className="flex items-center justify-between">
-            <span className="text-xl">Cabaña {cabana.nombre}</span>
+            <span className="text-xl">{cabana.nombre}</span>
             <span className="text-muted-foreground text-sm font-normal">
               {cabana.capacidad}
             </span>
@@ -173,7 +222,7 @@ function GalleryDialog({
   title,
   trigger,
 }: {
-  images: StaticImageData[];
+  images: string[];
   title: string;
   trigger: React.ReactNode;
 }) {
@@ -194,7 +243,7 @@ function GalleryDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
@@ -205,7 +254,7 @@ function GalleryDialog({
               alt={`${title} - imagen ${index + 1}`}
               width={800}
               height={500}
-              className="h-auto w-full rounded-lg object-cover"
+              className="aspect-square h-auto w-full rounded-lg object-cover"
             />
             {images.length > 1 && (
               <>
