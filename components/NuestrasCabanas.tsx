@@ -268,25 +268,27 @@ function GalleryDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="max-w-3xl bg-card">
-        <DialogHeader>
-          <DialogTitle className="font-serif text-xl">{title}</DialogTitle>
+      <DialogContent className="max-h-[90vh] w-[95vw] max-w-4xl overflow-hidden bg-card p-4 sm:p-6">
+        <DialogHeader className="pb-2">
+          <DialogTitle className="font-serif text-lg sm:text-xl">{title}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="relative overflow-hidden rounded-xl">
+        <div className="flex flex-col gap-3 overflow-hidden">
+          {/* Main Image Container */}
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg sm:rounded-xl">
             <Image
               src={images[index] || "/placeholder.svg"}
               alt={`${title} - imagen ${index + 1}`}
-              width={800}
-              height={500}
-              className="aspect-[4/3] h-auto w-full rounded-xl object-cover"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 95vw, 800px"
+              priority
             />
             {images.length > 1 && (
               <>
                 <Button
                   variant="outline"
                   size="icon"
-                  className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/90 shadow-lg backdrop-blur-sm hover:bg-white"
+                  className="absolute left-2 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full bg-white/90 shadow-lg backdrop-blur-sm hover:bg-white sm:left-4 sm:h-10 sm:w-10"
                   onClick={prev}
                   aria-label="Imagen anterior"
                 >
@@ -295,7 +297,7 @@ function GalleryDialog({
                 <Button
                   variant="outline"
                   size="icon"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/90 shadow-lg backdrop-blur-sm hover:bg-white"
+                  className="absolute right-2 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full bg-white/90 shadow-lg backdrop-blur-sm hover:bg-white sm:right-4 sm:h-10 sm:w-10"
                   onClick={next}
                   aria-label="Imagen siguiente"
                 >
@@ -304,20 +306,20 @@ function GalleryDialog({
               </>
             )}
             {/* Image Counter */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 text-sm text-white backdrop-blur-sm">
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-2.5 py-1 text-xs text-white backdrop-blur-sm sm:bottom-4 sm:px-3 sm:text-sm">
               {index + 1} / {images.length}
             </div>
           </div>
           {/* Thumbnails */}
           {images.length > 1 && (
-            <div className="flex justify-center gap-2 overflow-x-auto py-2">
+            <div className="flex justify-start gap-2 overflow-x-auto pb-1 sm:justify-center">
               {images.map((img, i) => (
                 <button
                   key={i}
                   onClick={() => goTo(i)}
-                  className={`relative h-16 w-20 flex-shrink-0 overflow-hidden rounded-lg transition-all ${
+                  className={`relative h-12 w-14 flex-shrink-0 overflow-hidden rounded-md transition-all sm:h-16 sm:w-20 sm:rounded-lg ${
                     i === index
-                      ? "ring-2 ring-primary ring-offset-2"
+                      ? "ring-2 ring-primary ring-offset-1 sm:ring-offset-2"
                       : "opacity-60 hover:opacity-100"
                   }`}
                   aria-label={`Ir a la imagen ${i + 1}`}
@@ -327,6 +329,7 @@ function GalleryDialog({
                     alt={`Thumbnail ${i + 1}`}
                     fill
                     className="object-cover"
+                    sizes="80px"
                   />
                 </button>
               ))}
