@@ -99,73 +99,81 @@ export default function Nav() {
         </button>
       </div>
 
-      {/* Mobile Navigation */}
+      {/* Mobile Navigation Overlay */}
       {isOpen && (
-        <div className="border-t border-border bg-background lg:hidden">
-          <nav className="container mx-auto flex flex-col gap-4 px-4 py-6">
-            <Link
-              href="#sobre"
-              onClick={() => setIsOpen(false)}
-              className="text-base font-medium text-foreground"
-            >
-              Sobre Nosotros
-            </Link>
-            <Link
-              href="#cabanas"
-              onClick={() => setIsOpen(false)}
-              className="text-base font-medium text-foreground"
-            >
-              Cabañas
-            </Link>
-            <Link
-              href="#servicios"
-              onClick={() => setIsOpen(false)}
-              className="text-base font-medium text-foreground"
-            >
-              Servicios
-            </Link>
-            <Link
-              href="#ubicacion"
-              onClick={() => setIsOpen(false)}
-              className="text-base font-medium text-foreground"
-            >
-              Ubicación
-            </Link>
-            <div className="flex items-center gap-3 pt-2">
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 top-16 z-40 bg-foreground/20 backdrop-blur-sm lg:hidden"
+            onClick={() => setIsOpen(false)}
+          />
+          {/* Menu */}
+          <div className="absolute left-0 right-0 top-16 z-50 border-b border-border bg-background shadow-lg lg:hidden">
+            <nav className="container mx-auto flex flex-col gap-4 px-4 py-6">
               <Link
-                href="https://www.facebook.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook"
-                className="rounded-full p-2 text-muted-foreground hover:bg-muted"
+                href="#sobre"
+                onClick={() => setIsOpen(false)}
+                className="text-base font-medium text-foreground"
               >
-                <SiFacebook size={20} aria-hidden="true" />
+                Sobre Nosotros
               </Link>
               <Link
-                href="https://www.instagram.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                className="rounded-full p-2 text-muted-foreground hover:bg-muted"
+                href="#cabanas"
+                onClick={() => setIsOpen(false)}
+                className="text-base font-medium text-foreground"
               >
-                <SiInstagram size={20} aria-hidden="true" />
+                Cabañas
               </Link>
-            </div>
-            <Button
-              asChild
-              className="mt-2 w-full bg-primary font-medium hover:bg-primary/90"
-            >
-              <a
-                href={whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Reservar por WhatsApp"
+              <Link
+                href="#servicios"
+                onClick={() => setIsOpen(false)}
+                className="text-base font-medium text-foreground"
               >
-                Reservar por WhatsApp
-              </a>
-            </Button>
-          </nav>
-        </div>
+                Servicios
+              </Link>
+              <Link
+                href="#ubicacion"
+                onClick={() => setIsOpen(false)}
+                className="text-base font-medium text-foreground"
+              >
+                Ubicación
+              </Link>
+              <div className="flex items-center gap-3 pt-2">
+                <Link
+                  href="https://www.facebook.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="rounded-full p-2 text-muted-foreground hover:bg-muted"
+                >
+                  <SiFacebook size={20} aria-hidden="true" />
+                </Link>
+                <Link
+                  href="https://www.instagram.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="rounded-full p-2 text-muted-foreground hover:bg-muted"
+                >
+                  <SiInstagram size={20} aria-hidden="true" />
+                </Link>
+              </div>
+              <Button
+                asChild
+                className="mt-2 w-full bg-primary font-medium hover:bg-primary/90"
+              >
+                <a
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Reservar por WhatsApp"
+                >
+                  Reservar por WhatsApp
+                </a>
+              </Button>
+            </nav>
+          </div>
+        </>
       )}
     </header>
   );
