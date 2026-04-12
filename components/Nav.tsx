@@ -4,7 +4,7 @@ import { SiFacebook, SiInstagram } from "react-icons/si";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const WHATSAPP_NUMBER = "59898976924";
 const WHATSAPP_TEXT =
@@ -13,8 +13,27 @@ const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent
   WHATSAPP_TEXT
 )}`;
 
+const navLinks = [
+  { href: "#sobre", label: "Sobre Nosotros" },
+  { href: "#cabanas", label: "Cabañas" },
+  { href: "#servicios", label: "Servicios" },
+  { href: "#ubicacion", label: "Ubicación" },
+];
+
 export default function Nav() {
   const [isOpen, setIsOpen] = useState(false);
+
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -27,30 +46,15 @@ export default function Nav() {
 
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-8 lg:flex">
-          <Link
-            href="#sobre"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Sobre Nosotros
-          </Link>
-          <Link
-            href="#cabanas"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Cabañas
-          </Link>
-          <Link
-            href="#servicios"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Servicios
-          </Link>
-          <Link
-            href="#ubicacion"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Ubicación
-          </Link>
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {link.label}
+            </Link>
+          ))}
         </nav>
 
         <div className="hidden items-center gap-4 lg:flex">
@@ -92,89 +96,110 @@ export default function Nav() {
         {/* Mobile Menu Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="rounded-md p-2 text-foreground lg:hidden"
+          className="relative z-50 rounded-md p-2 text-foreground transition-transform duration-200 lg:hidden"
           aria-label="Menú"
         >
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
+          <div className="relative h-6 w-6">
+            <Menu 
+              size={24} 
+              className={`absolute inset-0 transition-all duration-300 ${
+                isOpen ? "rotate-90 scale-0 opacity-0" : "rotate-0 scale-100 opacity-100"
+              }`}
+            />
+            <X 
+              size={24} 
+              className={`absolute inset-0 transition-all duration-300 ${
+                isOpen ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-0 opacity-0"
+              }`}
+            />
+          </div>
         </button>
       </div>
 
-      {/* Mobile Navigation Overlay */}
-      {isOpen && (
-        <>
-          {/* Backdrop */}
+      {/* Fullscreen Mobile Navigation */}
+      <div
+        className={`fixed inset-0 z-40 bg-background transition-all duration-500 ease-out lg:hidden ${
+          isOpen 
+            ? "opacity-100 visible" 
+            : "opacity-0 invisible"
+        }`}
+      >
+        <nav className="flex h-full flex-col items-center justify-center gap-2">
+          {navLinks.map((link, index) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setIsOpen(false)}
+              className={`group relative overflow-hidden py-3 transition-all duration-500 ${
+                isOpen 
+                  ? "translate-y-0 opacity-100" 
+                  : "translate-y-8 opacity-0"
+              }`}
+              style={{ transitionDelay: isOpen ? `${index * 75 + 100}ms` : "0ms" }}
+            >
+              <span className="font-serif text-4xl font-medium text-foreground transition-colors group-hover:text-primary sm:text-5xl">
+                {link.label}
+              </span>
+              <span className="absolute bottom-2 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full" />
+            </Link>
+          ))}
+
+          {/* Social Links */}
           <div 
-            className="fixed inset-0 top-16 z-40 bg-foreground/20 backdrop-blur-sm lg:hidden"
-            onClick={() => setIsOpen(false)}
-          />
-          {/* Menu */}
-          <div className="absolute left-0 right-0 top-16 z-50 border-b border-border bg-background shadow-lg lg:hidden">
-            <nav className="container mx-auto flex flex-col gap-4 px-4 py-6">
-              <Link
-                href="#sobre"
-                onClick={() => setIsOpen(false)}
-                className="text-base font-medium text-foreground"
-              >
-                Sobre Nosotros
-              </Link>
-              <Link
-                href="#cabanas"
-                onClick={() => setIsOpen(false)}
-                className="text-base font-medium text-foreground"
-              >
-                Cabañas
-              </Link>
-              <Link
-                href="#servicios"
-                onClick={() => setIsOpen(false)}
-                className="text-base font-medium text-foreground"
-              >
-                Servicios
-              </Link>
-              <Link
-                href="#ubicacion"
-                onClick={() => setIsOpen(false)}
-                className="text-base font-medium text-foreground"
-              >
-                Ubicación
-              </Link>
-              <div className="flex items-center gap-3 pt-2">
-                <Link
-                  href="https://www.facebook.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Facebook"
-                  className="rounded-full p-2 text-muted-foreground hover:bg-muted"
-                >
-                  <SiFacebook size={20} aria-hidden="true" />
-                </Link>
-                <Link
-                  href="https://www.instagram.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Instagram"
-                  className="rounded-full p-2 text-muted-foreground hover:bg-muted"
-                >
-                  <SiInstagram size={20} aria-hidden="true" />
-                </Link>
-              </div>
-              <Button
-                asChild
-                className="mt-2 w-full bg-primary font-medium hover:bg-primary/90"
-              >
-                <a
-                  href={whatsappHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Reservar por WhatsApp"
-                >
-                  Reservar por WhatsApp
-                </a>
-              </Button>
-            </nav>
+            className={`mt-8 flex items-center gap-4 transition-all duration-500 ${
+              isOpen 
+                ? "translate-y-0 opacity-100" 
+                : "translate-y-8 opacity-0"
+            }`}
+            style={{ transitionDelay: isOpen ? "400ms" : "0ms" }}
+          >
+            <Link
+              href="https://www.facebook.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+              className="rounded-full border border-border p-3 text-muted-foreground transition-all hover:border-primary hover:bg-primary hover:text-primary-foreground"
+            >
+              <SiFacebook size={24} aria-hidden="true" />
+            </Link>
+            <Link
+              href="https://www.instagram.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="rounded-full border border-border p-3 text-muted-foreground transition-all hover:border-primary hover:bg-primary hover:text-primary-foreground"
+            >
+              <SiInstagram size={24} aria-hidden="true" />
+            </Link>
           </div>
-        </>
-      )}
+
+          {/* CTA Button */}
+          <div
+            className={`mt-6 transition-all duration-500 ${
+              isOpen 
+                ? "translate-y-0 opacity-100" 
+                : "translate-y-8 opacity-0"
+            }`}
+            style={{ transitionDelay: isOpen ? "475ms" : "0ms" }}
+          >
+            <Button
+              asChild
+              size="lg"
+              className="bg-primary px-10 py-6 text-lg font-medium hover:bg-primary/90"
+            >
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Reservar por WhatsApp"
+                onClick={() => setIsOpen(false)}
+              >
+                Reservar por WhatsApp
+              </a>
+            </Button>
+          </div>
+        </nav>
+      </div>
     </header>
   );
 }
