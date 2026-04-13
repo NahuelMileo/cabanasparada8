@@ -1,7 +1,7 @@
 "use client";
+
 import Image from "next/image";
 import { Button } from "./ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
 import {
   Dialog,
   DialogContent,
@@ -9,28 +9,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Users, Expand } from "lucide-react";
 import { motion } from "framer-motion";
 import React from "react";
 
 const fadeInUp = {
-  initial: { opacity: 0, y: 60 },
+  initial: { opacity: 0, y: 40 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 1.2, ease: [0.6, -0.05, 0.01, 0.99] },
+  transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
 };
 
 const staggerContainer = {
   animate: {
     transition: {
-      staggerChildren: 0.2,
+      staggerChildren: 0.1,
     },
   },
-};
-
-const scaleIn = {
-  initial: { opacity: 0, scale: 0.8 },
-  animate: { opacity: 1, scale: 1 },
-  transition: { duration: 1.0, ease: [0.6, -0.05, 0.01, 0.99] },
 };
 
 type Cabin = {
@@ -135,78 +129,109 @@ const cabanas: Cabin[] = [
 
 function CabanaCard({ cabana }: { cabana: Cabin }) {
   return (
-    <motion.div
-      variants={scaleIn}
-      whileHover={{ y: -8, transition: { duration: 0.4 } }}
-      className="h-full"
-    >
-      <Card className="h-full overflow-hidden">
-        <motion.div
-          className="relative h-56 w-full sm:h-64"
-          whileHover={{ scale: 1.05 }}
-          transition={{ duration: 0.6 }}
-        >
+    <motion.div variants={fadeInUp} className="group">
+      <div className="relative overflow-hidden rounded-2xl bg-card">
+        {/* Image */}
+        <div className="relative aspect-[4/3] overflow-hidden">
           <Image
             src={cabana.portada}
             alt={`${cabana.nombre} - exterior`}
             fill
-            className="object-cover"
-            sizes="(max-width: 640px) 100vw, 50vw"
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
-        </motion.div>
-        <CardHeader className="space-y-1">
-          <CardTitle className="flex items-center justify-between">
-            <span className="text-xl">{cabana.nombre}</span>
-            <span className="text-muted-foreground text-sm font-normal">
-              {cabana.capacidad}
-            </span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <ul className="text-muted-foreground grid grid-cols-2 gap-2 text-sm">
+          {/* Overlay on hover */}
+          <div className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/20" />
+
+          {/* Gallery Button */}
+          <GalleryDialog
+            title={cabana.nombre}
+            images={cabana.imagenes}
+            trigger={
+              <button className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 opacity-0 shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-white group-hover:opacity-100">
+                <Expand className="h-4 w-4 text-foreground" />
+              </button>
+            }
+          />
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+          <div className="mb-4 flex items-start justify-between">
+            <div>
+              <h3 className="font-serif text-xl font-semibold text-foreground">
+                {cabana.nombre}
+              </h3>
+              <div className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Users className="h-4 w-4" />
+                <span>{cabana.capacidad}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Amenities */}
+          <div className="flex flex-wrap gap-2">
             {cabana.comodidades.map((item) => (
-              <li key={item} className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-teal-600" />
+              <span
+                key={item}
+                className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground"
+              >
                 {item}
-              </li>
+              </span>
             ))}
-          </ul>
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <GalleryDialog
-              title={`${cabana.nombre}`}
-              images={cabana.imagenes}
-              trigger={<Button className="w-full">Ver fotos</Button>}
-            />
-          </motion.div>
-        </CardContent>
-      </Card>
+          </div>
+
+          {/* View Photos Button */}
+          <GalleryDialog
+            title={cabana.nombre}
+            images={cabana.imagenes}
+            trigger={
+              <Button
+                variant="outline"
+                className="mt-5 w-full border-primary/20 text-primary hover:bg-primary/5 hover:text-primary"
+              >
+                Ver galería de fotos
+              </Button>
+            }
+          />
+        </div>
+      </div>
     </motion.div>
   );
 }
 
-export default function Page() {
+export default function NuestrasCabanas() {
   return (
     <motion.section
       id="cabanas"
-      className="bg-muted/30 w-full py-16"
+      className="w-full bg-muted/50 py-20 lg:py-28"
       initial="initial"
       whileInView="animate"
       viewport={{ once: true, margin: "-100px" }}
       variants={staggerContainer}
     >
-      <div className="container mx-auto space-y-8 px-4">
-        <motion.div variants={fadeInUp} className="space-y-2 text-center">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+      <div className="container mx-auto px-4 lg:px-8">
+        {/* Header */}
+        <motion.div
+          variants={fadeInUp}
+          className="mx-auto mb-12 max-w-2xl text-center lg:mb-16"
+        >
+          <span className="text-sm font-medium uppercase tracking-widest text-primary">
+            Alojamiento
+          </span>
+          <h2 className="mt-3 font-serif text-3xl font-semibold leading-tight tracking-tight text-foreground sm:text-4xl lg:text-5xl">
             Nuestras cabañas
           </h2>
-          <p className="text-muted-foreground mx-auto max-w-2xl">
-            Cabañas cómodas y equipadas para 4 a 6 personas, ideales para
-            descansar y disfrutar del mar.
+          <p className="mt-4 text-base leading-relaxed text-muted-foreground lg:text-lg">
+            Cabañas cómodas y completamente equipadas, ideales para descansar y
+            disfrutar del mar en familia o con amigos.
           </p>
         </motion.div>
+
+        {/* Grid */}
         <motion.div
           variants={staggerContainer}
-          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
           {cabanas.map((cab) => (
             <CabanaCard key={cab.id} cabana={cab} />
@@ -243,25 +268,27 @@ function GalleryDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
+      <DialogContent className="max-h-[90vh] w-[95vw] max-w-4xl overflow-hidden bg-card p-4 sm:p-6">
+        <DialogHeader className="pb-2">
+          <DialogTitle className="font-serif text-lg sm:text-xl">{title}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="relative">
+        <div className="flex flex-col gap-3 overflow-hidden">
+          {/* Main Image Container */}
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg sm:rounded-xl">
             <Image
               src={images[index] || "/placeholder.svg"}
               alt={`${title} - imagen ${index + 1}`}
-              width={800}
-              height={500}
-              className="aspect-square h-auto w-full rounded-lg object-cover"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 95vw, 800px"
+              priority
             />
             {images.length > 1 && (
               <>
                 <Button
                   variant="outline"
                   size="icon"
-                  className="absolute top-1/2 left-2 -translate-y-1/2 bg-white/80 hover:bg-white"
+                  className="absolute left-2 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full bg-white/90 shadow-lg backdrop-blur-sm hover:bg-white sm:left-4 sm:h-10 sm:w-10"
                   onClick={prev}
                   aria-label="Imagen anterior"
                 >
@@ -270,7 +297,7 @@ function GalleryDialog({
                 <Button
                   variant="outline"
                   size="icon"
-                  className="absolute top-1/2 right-2 -translate-y-1/2 bg-white/80 hover:bg-white"
+                  className="absolute right-2 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full bg-white/90 shadow-lg backdrop-blur-sm hover:bg-white sm:right-4 sm:h-10 sm:w-10"
                   onClick={next}
                   aria-label="Imagen siguiente"
                 >
@@ -278,20 +305,33 @@ function GalleryDialog({
                 </Button>
               </>
             )}
+            {/* Image Counter */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-2.5 py-1 text-xs text-white backdrop-blur-sm sm:bottom-4 sm:px-3 sm:text-sm">
+              {index + 1} / {images.length}
+            </div>
           </div>
+          {/* Thumbnails */}
           {images.length > 1 && (
-            <div className="flex justify-center gap-2">
-              {images.map((_, i) => (
+            <div className="flex justify-start gap-2 overflow-x-auto pb-1 sm:justify-center">
+              {images.map((img, i) => (
                 <button
                   key={i}
                   onClick={() => goTo(i)}
-                  className={`h-3 w-3 cursor-pointer rounded-full border-none transition-colors ${
+                  className={`relative h-12 w-14 flex-shrink-0 overflow-hidden rounded-md transition-all sm:h-16 sm:w-20 sm:rounded-lg ${
                     i === index
-                      ? "bg-teal-600"
-                      : "bg-gray-300 hover:bg-gray-400"
+                      ? "ring-2 ring-primary ring-offset-1 sm:ring-offset-2"
+                      : "opacity-60 hover:opacity-100"
                   }`}
                   aria-label={`Ir a la imagen ${i + 1}`}
-                />
+                >
+                  <Image
+                    src={img}
+                    alt={`Thumbnail ${i + 1}`}
+                    fill
+                    className="object-cover"
+                    sizes="80px"
+                  />
+                </button>
               ))}
             </div>
           )}
