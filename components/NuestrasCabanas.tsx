@@ -1,244 +1,185 @@
 "use client";
 
+import React, { useRef } from "react";
 import Image from "next/image";
-import { Button } from "./ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
-import { ChevronLeft, ChevronRight, Users, Expand } from "lucide-react";
-import { motion } from "framer-motion";
-import React from "react";
+import { ChevronLeft, ChevronRight, Users, Images, MessageCircle } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
+import Words from "./motion/Words";
+import { gsap, useGSAP, MOTION_OK, getLenis } from "@/lib/motion";
+import { cabanas, type Cabin } from "@/lib/cabanas";
+import { whatsappLink } from "@/lib/contact";
 
-const fadeInUp = {
-  initial: { opacity: 0, y: 40 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
-};
+const consulta = (c: Cabin) =>
+  whatsappLink(`Hola, me gustaría consultar disponibilidad y precios de ${c.nombre} (${c.capacidad}) en Cabañas Parada 8. Gracias.`);
 
-const staggerContainer = {
-  animate: {
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
+// Fondo neutro para todas las cabañas: la foto es la protagonista
+const panelBg = ["bg-noche"];
 
-type Cabin = {
-  id: string;
-  nombre: string;
-  capacidad: string;
-  portada: string;
-  imagenes: string[];
-  comodidades: string[];
-};
-
-const img = (cab: string, file: string) => `/${cab}/${file}`;
-
-const cabanas: Cabin[] = [
-  {
-    id: "apartamento",
-    nombre: "Apartamento",
-    capacidad: "2 personas",
-    portada: img("apartamento", "sala_2.webp"),
-    imagenes: [
-      img("apartamento", "sala.webp"),
-      img("apartamento", "sala_2.webp"),
-      img("apartamento", "cocina.webp"),
-      img("apartamento", "dormitorio.webp"),
-      img("apartamento", "bano.webp"),
-    ],
-    comodidades: ["Sommier", "Aire acondicionado", "Smart TV", "Wifi"],
-  },
-  {
-    id: "bordo",
-    nombre: "Casa Bordó",
-    capacidad: "4 personas",
-    portada: img("bordo", "sala.webp"),
-    imagenes: [
-      img("bordo", "sala.webp"),
-      img("bordo", "sala_2.webp"),
-      img("bordo", "sala_3.webp"),
-      img("bordo", "cocina.webp"),
-      img("bordo", "cocina_2.webp"),
-      img("bordo", "dormitorio.webp"),
-      img("bordo", "dormitorio_2.webp"),
-      img("bordo", "bano.webp"),
-      img("bordo", "bano_2.webp"),
-    ],
-    comodidades: ["Sommier", "Aire acondicionado", "Parrillero", "Wifi"],
-  },
-  {
-    id: "blanca",
-    nombre: "Casa Blanca",
-    capacidad: "4 personas",
-    portada: img("blanca", "parrilla.webp"),
-    imagenes: [
-      img("blanca", "sala.webp"),
-      img("blanca", "cocina.webp"),
-      img("blanca", "dormitorio.webp"),
-      img("blanca", "cuarto.webp"),
-      img("blanca", "bano.webp"),
-      img("blanca", "parrilla.webp"),
-      img("blanca", "estacionamiento.webp"),
-    ],
-    comodidades: ["Sommier", "Aire acondicionado", "Smart TV", "Wifi"],
-  },
-  {
-    id: "calle",
-    nombre: "Calle",
-    capacidad: "4-6 personas",
-    portada: img("calle", "afuera.webp"),
-    imagenes: [
-      img("calle", "sala.webp"),
-      img("calle", "sala_2.webp"),
-      img("calle", "cocina.webp"),
-      img("calle", "parrilla.webp"),
-      img("calle", "dormitorio.webp"),
-      img("calle", "dormitorio_2.webp"),
-      img("calle", "cuarto.webp"),
-      img("calle", "bano.webp"),
-    ],
-    comodidades: [
-      "Hasta 6 huéspedes",
-      "Aire acondicionado",
-      "Parrillero",
-      "Wifi",
-    ],
-  },
-  {
-    id: "medio",
-    nombre: "Medio",
-    capacidad: "4-6 personas",
-    portada: img("medio", "sala.webp"),
-    imagenes: [
-      img("medio", "sala.webp"),
-      img("medio", "cocina.webp"),
-      img("medio", "comedor.webp"),
-      img("medio", "dormitorio.webp"),
-      img("medio", "dormitorio_2.webp"),
-      img("medio", "cuarto.webp"),
-      img("medio", "bano.webp"),
-    ],
-    comodidades: ["Hasta 6 huéspedes", "Smart TV", "Cocina equipada", "Wifi"],
-  },
-];
-
-function CabanaCard({ cabana }: { cabana: Cabin }) {
+function Panel({ cabana, index }: { cabana: Cabin; index: number }) {
   return (
-    <motion.div variants={fadeInUp} className="group">
-      <div className="relative overflow-hidden rounded-2xl bg-card">
-        {/* Image */}
-        <div className="relative aspect-[4/3] overflow-hidden">
-          <Image
-            src={cabana.portada}
-            alt={`${cabana.nombre} - exterior`}
-            fill
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          />
-          {/* Overlay on hover */}
-          <div className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/20" />
+    <article
+      data-panel={index}
+      className={`cab-panel grid h-svh w-full grid-rows-[48svh_1fr] overflow-hidden lg:grid-cols-2 lg:grid-rows-1 ${panelBg[index % panelBg.length]} group-[.is-pinned]:absolute group-[.is-pinned]:inset-0`}
+    >
+      {/* Las fotos son verticales: van en una columna alta para no recortarlas */}
+      <div className="relative overflow-hidden lg:order-last">
+        <Image
+          src={cabana.portada}
+          alt={`${cabana.nombre}: vista principal`}
+          fill
+          sizes="(max-width: 1024px) 100vw, 50vw"
+          className="cab-img object-cover"
+          priority={index === 0}
+        />
+      </div>
 
-          {/* Gallery Button */}
+      <div className="cab-content flex flex-col justify-center px-5 py-6 lg:px-[max(2rem,calc((100vw-80rem)/2+2rem))] lg:py-20 lg:pr-16">
+        <p className="font-display text-base font-semibold text-white/70 lg:text-lg">
+          {String(index + 1).padStart(2, "0")} / {String(cabanas.length).padStart(2, "0")}
+        </p>
+        <h3 className="font-display mt-1 text-[clamp(2.8rem,8vw,7rem)] leading-[0.85] font-extrabold tracking-tight">
+          {cabana.nombre}
+        </h3>
+        <p className="mt-3 flex items-center gap-2 text-lg text-white/90 lg:mt-5">
+          <Users className="h-5 w-5" />
+          {cabana.capacidad}
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2 lg:mt-6">
+          {cabana.comodidades.map((c) => (
+            <span key={c} className="rounded-full bg-white/15 px-3.5 py-1.5 text-sm font-medium backdrop-blur">
+              {c}
+            </span>
+          ))}
+        </div>
+        <div className="mt-5 flex flex-col gap-2.5 sm:flex-row lg:mt-9">
           <GalleryDialog
             title={cabana.nombre}
             images={cabana.imagenes}
             trigger={
-              <button className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 opacity-0 shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-white group-hover:opacity-100">
-                <Expand className="h-4 w-4 text-foreground" />
+              <button className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 font-semibold text-noche transition-colors hover:bg-muted lg:py-3.5">
+                <Images className="h-4 w-4" />
+                Ver las {cabana.imagenes.length} fotos
               </button>
             }
           />
-        </div>
-
-        {/* Content */}
-        <div className="p-6">
-          <div className="mb-4 flex items-start justify-between">
-            <div>
-              <h3 className="font-serif text-xl font-semibold text-foreground">
-                {cabana.nombre}
-              </h3>
-              <div className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Users className="h-4 w-4" />
-                <span>{cabana.capacidad}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Amenities */}
-          <div className="flex flex-wrap gap-2">
-            {cabana.comodidades.map((item) => (
-              <span
-                key={item}
-                className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground"
-              >
-                {item}
-              </span>
-            ))}
-          </div>
-
-          {/* View Photos Button */}
-          <GalleryDialog
-            title={cabana.nombre}
-            images={cabana.imagenes}
-            trigger={
-              <Button
-                variant="outline"
-                className="mt-5 w-full border-primary/20 text-primary hover:bg-primary/5 hover:text-primary"
-              >
-                Ver galería de fotos
-              </Button>
-            }
-          />
+          <a
+            href={consulta(cabana)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-white px-6 py-3 font-semibold text-white transition-colors hover:bg-white hover:text-noche lg:py-3.5"
+          >
+            <MessageCircle className="h-4 w-4" />
+            Consultar esta cabaña
+          </a>
         </div>
       </div>
-    </motion.div>
+    </article>
   );
 }
 
+/** Vitrina: la sección queda fija y cada cabaña entra como un telón sobre la anterior. */
 export default function NuestrasCabanas() {
-  return (
-    <motion.section
-      id="cabanas"
-      className="w-full bg-muted/50 py-20 lg:py-28"
-      initial="initial"
-      whileInView="animate"
-      viewport={{ once: true, margin: "-100px" }}
-      variants={staggerContainer}
-    >
-      <div className="container mx-auto px-4 lg:px-8">
-        {/* Header */}
-        <motion.div
-          variants={fadeInUp}
-          className="mx-auto mb-12 max-w-2xl text-center lg:mb-16"
-        >
-          <span className="text-sm font-medium uppercase tracking-widest text-primary">
-            Alojamiento
-          </span>
-          <h2 className="mt-3 font-serif text-3xl font-semibold leading-tight tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-            Nuestras cabañas
-          </h2>
-          <p className="mt-4 text-base leading-relaxed text-muted-foreground lg:text-lg">
-            Cabañas cómodas y completamente equipadas, ideales para descansar y
-            disfrutar del mar en familia o con amigos.
-          </p>
-        </motion.div>
+  const root = useRef<HTMLElement>(null);
+  const stage = useRef<HTMLDivElement>(null);
 
-        {/* Grid */}
-        <motion.div
-          variants={staggerContainer}
-          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+      mm.add(MOTION_OK, () => {
+        const el = stage.current;
+        if (!el) return;
+        el.classList.add("is-pinned");
+        const panels = gsap.utils.toArray<HTMLElement>(".cab-panel", el);
+        const dots = gsap.utils.toArray<HTMLElement>(".cab-dot", el);
+        const steps = panels.length - 1;
+        const setActive = (i: number) =>
+          dots.forEach((d, j) => d.classList.toggle("is-active", i === j));
+        setActive(0);
+
+        const tl = gsap.timeline({
+          defaults: { ease: "none" },
+          scrollTrigger: {
+            trigger: el,
+            start: "top top",
+            end: () => `+=${steps * window.innerHeight}`,
+            pin: true,
+            scrub: 1,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => setActive(Math.round(self.progress * steps)),
+          },
+        });
+
+        panels.forEach((panel, i) => {
+          if (i === 0) return;
+          const prev = panels[i - 1];
+          tl.fromTo(panel, { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 1 }, i - 1)
+            .fromTo(panel.querySelector(".cab-img"), { scale: 1.3 }, { scale: 1, duration: 1 }, i - 1)
+            .fromTo(prev.querySelector(".cab-img"), { scale: 1 }, { scale: 1.12, duration: 1, immediateRender: false }, i - 1)
+            // El texto anterior sale al empezar el telón y el nuevo llega antes de que termine:
+            // así en cada parada (progreso entero) el texto visible es siempre el de la cabaña actual.
+            .fromTo(
+              prev.querySelector(".cab-content"),
+              { y: 0, opacity: 1 },
+              { y: -50, opacity: 0, duration: 0.35, immediateRender: false },
+              i - 1 + 0.05,
+            )
+            .fromTo(
+              panel.querySelector(".cab-content"),
+              { y: 60, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.45, immediateRender: false },
+              i - 0.55,
+            );
+        });
+
+        return () => el.classList.remove("is-pinned");
+      });
+      return () => mm.revert();
+    },
+    { scope: root },
+  );
+
+  return (
+    <section id="cabanas" ref={root} className="bg-noche text-white">
+      <div className="mx-auto max-w-7xl px-4 pt-24 pb-14 lg:px-8 lg:pt-36 lg:pb-20">
+        <span data-fade className="block text-sm font-semibold text-white/60">
+          Alojamiento
+        </span>
+        <div className="mt-4 flex flex-wrap items-end justify-between gap-6">
+          <h2
+            data-words
+            className="font-display max-w-3xl text-[clamp(2.6rem,5vw,4.5rem)] leading-[0.92] font-extrabold tracking-tight"
+          >
+            <Words text="Cinco lugares para quedarte" />
+          </h2>
+          <p data-fade className="max-w-sm text-white/70">
+            Cómodos y completamente equipados, para descansar y disfrutar del mar
+            en pareja, en familia o con amigos.
+          </p>
+        </div>
+      </div>
+
+      <div ref={stage} className="group relative [&.is-pinned]:h-svh [&.is-pinned]:overflow-hidden">
+        {cabanas.map((cab, i) => (
+          <Panel key={cab.id} cabana={cab} index={i} />
+        ))}
+
+        <nav
+          aria-label="Cabañas"
+          className="pointer-events-none absolute top-1/2 right-8 z-10 hidden -translate-y-1/2 flex-col items-end gap-3 rounded-2xl bg-noche/45 px-4 py-3 backdrop-blur lg:group-[.is-pinned]:flex"
         >
           {cabanas.map((cab) => (
-            <CabanaCard key={cab.id} cabana={cab} />
+            <span
+              key={cab.id}
+              className="cab-dot font-display flex items-center gap-3 text-sm font-semibold tracking-wider text-white/45 transition-colors duration-300 [&.is-active]:text-white"
+            >
+              <span className="hidden md:inline">{cab.nombre}</span>
+              <span className="h-2 w-2 rounded-full bg-current transition-transform duration-300" />
+            </span>
           ))}
-        </motion.div>
+        </nav>
       </div>
-    </motion.section>
+    </section>
   );
 }
 
@@ -252,89 +193,74 @@ function GalleryDialog({
   trigger: React.ReactNode;
 }) {
   const [index, setIndex] = React.useState(0);
-
-  function prev() {
-    setIndex((i) => (i - 1 + images.length) % images.length);
-  }
-
-  function next() {
-    setIndex((i) => (i + 1) % images.length);
-  }
-
-  function goTo(i: number) {
-    setIndex(i);
-  }
+  const prev = () => setIndex((i) => (i - 1 + images.length) % images.length);
+  const next = () => setIndex((i) => (i + 1) % images.length);
 
   return (
-    <Dialog>
+    <Dialog
+      onOpenChange={(open) => {
+        const lenis = getLenis();
+        if (open) lenis?.stop();
+        else lenis?.start();
+      }}
+    >
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="max-h-[90vh] w-[95vw] max-w-4xl overflow-hidden bg-card p-4 sm:p-6">
-        <DialogHeader className="pb-2">
-          <DialogTitle className="font-serif text-lg sm:text-xl">{title}</DialogTitle>
+      <DialogContent
+        className="max-h-[92vh] w-[95vw] max-w-5xl overflow-hidden bg-card p-3 sm:p-5"
+        onKeyDown={(e) => {
+          if (e.key === "ArrowLeft") prev();
+          if (e.key === "ArrowRight") next();
+        }}
+      >
+        <DialogHeader className="pb-1">
+          <DialogTitle className="font-display text-2xl font-bold">{title}</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col gap-3 overflow-hidden">
-          {/* Main Image Container */}
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg sm:rounded-xl">
+        <div className="flex flex-col gap-3">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-muted">
             <Image
-              src={images[index] || "/placeholder.svg"}
-              alt={`${title} - imagen ${index + 1}`}
+              key={images[index]}
+              src={images[index]}
+              alt={`${title}, foto ${index + 1} de ${images.length}`}
               fill
-              className="object-cover"
-              sizes="(max-width: 768px) 95vw, 800px"
-              priority
+              className="animate-in fade-in object-cover duration-300"
+              sizes="(max-width: 768px) 95vw, 1000px"
             />
             {images.length > 1 && (
               <>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="absolute left-2 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full bg-white/90 shadow-lg backdrop-blur-sm hover:bg-white sm:left-4 sm:h-10 sm:w-10"
+                <button
+                  className="absolute top-1/2 left-3 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-noche shadow-lg hover:bg-white"
                   onClick={prev}
-                  aria-label="Imagen anterior"
+                  aria-label="Foto anterior"
                 >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="absolute right-2 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full bg-white/90 shadow-lg backdrop-blur-sm hover:bg-white sm:right-4 sm:h-10 sm:w-10"
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <button
+                  className="absolute top-1/2 right-3 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-noche shadow-lg hover:bg-white"
                   onClick={next}
-                  aria-label="Imagen siguiente"
+                  aria-label="Foto siguiente"
                 >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
+                  <ChevronRight className="h-5 w-5" />
+                </button>
               </>
             )}
-            {/* Image Counter */}
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-2.5 py-1 text-xs text-white backdrop-blur-sm sm:bottom-4 sm:px-3 sm:text-sm">
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 text-sm text-white tabular-nums">
               {index + 1} / {images.length}
             </div>
           </div>
-          {/* Thumbnails */}
-          {images.length > 1 && (
-            <div className="flex justify-start gap-2 overflow-x-auto pb-1 sm:justify-center">
-              {images.map((img, i) => (
-                <button
-                  key={i}
-                  onClick={() => goTo(i)}
-                  className={`relative h-12 w-14 flex-shrink-0 overflow-hidden rounded-md transition-all sm:h-16 sm:w-20 sm:rounded-lg ${
-                    i === index
-                      ? "ring-2 ring-primary ring-offset-1 sm:ring-offset-2"
-                      : "opacity-60 hover:opacity-100"
-                  }`}
-                  aria-label={`Ir a la imagen ${i + 1}`}
-                >
-                  <Image
-                    src={img}
-                    alt={`Thumbnail ${i + 1}`}
-                    fill
-                    className="object-cover"
-                    sizes="80px"
-                  />
-                </button>
-              ))}
-            </div>
-          )}
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {images.map((src, i) => (
+              <button
+                key={src}
+                onClick={() => setIndex(i)}
+                className={`relative h-14 w-20 shrink-0 overflow-hidden rounded-lg transition-opacity ${
+                  i === index ? "ring-2 ring-bordo ring-offset-2" : "opacity-60 hover:opacity-100"
+                }`}
+                aria-label={`Ver foto ${i + 1}`}
+              >
+                <Image src={src} alt="" fill className="object-cover" sizes="80px" />
+              </button>
+            ))}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

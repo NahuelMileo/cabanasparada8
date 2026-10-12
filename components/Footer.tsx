@@ -1,130 +1,82 @@
 "use client";
 
-import Link from "next/link";
-import { SiFacebook, SiInstagram, SiWhatsapp } from "react-icons/si";
-import { motion } from "framer-motion";
-
-const WHATSAPP_NUMBER = "59898976924";
-const WHATSAPP_TEXT =
-  "Hola, me gustaría consultar disponibilidad y precios de Cabañas Parada 8. ¿Me podrás informar? Gracias.";
-const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-  WHATSAPP_TEXT
-)}`;
+import { useRef } from "react";
+import { gsap, useGSAP, MOTION_OK } from "@/lib/motion";
+import { PHONE_DISPLAY, whatsappLink } from "@/lib/contact";
 
 const navLinks = [
-  { href: "#sobre", label: "Sobre Nosotros" },
+  { href: "#sobre", label: "Nosotros" },
   { href: "#cabanas", label: "Cabañas" },
   { href: "#servicios", label: "Servicios" },
-  { href: "#ubicacion", label: "Ubicación" },
   { href: "#reservas", label: "Reservas" },
-];
-
-const socialLinks = [
-  {
-    href: "https://www.facebook.com/",
-    label: "Facebook",
-    icon: SiFacebook,
-  },
-  {
-    href: "https://www.instagram.com/",
-    label: "Instagram",
-    icon: SiInstagram,
-  },
-  {
-    href: whatsappHref,
-    label: "WhatsApp",
-    icon: SiWhatsapp,
-  },
+  { href: "#ubicacion", label: "Ubicación" },
 ];
 
 export default function Footer() {
+  const root = useRef<HTMLElement>(null);
+
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+      mm.add(MOTION_OK, () => {
+        gsap.from(".foot-eight", {
+          yPercent: 60,
+          rotate: -8,
+          ease: "none",
+          scrollTrigger: { trigger: root.current, start: "top bottom", end: "bottom bottom", scrub: true },
+        });
+      });
+      return () => mm.revert();
+    },
+    { scope: root },
+  );
+
   return (
-    <motion.footer
-      className="border-t border-border bg-card"
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8 }}
-    >
-      <div className="container mx-auto px-4 py-12 lg:px-8 lg:py-16">
-        <div className="grid gap-8 lg:grid-cols-3">
-          {/* Brand */}
-          <div className="space-y-4">
-            <Link href="#" className="inline-block">
-              <span className="font-serif text-2xl font-semibold text-foreground">
-                Cabañas Parada 8
-              </span>
-            </Link>
-            <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
+    <footer ref={root} className="relative overflow-hidden bg-noche text-white">
+      <div className="mx-auto grid max-w-7xl gap-12 px-4 py-16 lg:grid-cols-[1.2fr_1fr_1fr] lg:px-8">
+        <div className="flex items-start gap-6">
+          <div className="foot-eight font-display flex h-32 w-24 shrink-0 flex-col items-center justify-center rounded-xl bg-white text-bordo">
+            <span className="text-[10px] font-bold">Parada</span>
+            <span className="text-7xl leading-[0.85] font-extrabold">8</span>
+          </div>
+          <div>
+            <p className="font-display text-2xl font-bold">Cabañas Parada 8</p>
+            <p className="mt-2 max-w-xs text-sm leading-relaxed text-white/65">
               Tu refugio junto al mar en Barra del Chuy, Uruguay. Más de 20 años
               brindando descanso y atención familiar.
             </p>
-            {/* Social Links */}
-            <div className="flex items-center gap-3">
-              {socialLinks.map((social) => (
-                <Link
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={social.label}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
-                >
-                  <social.icon size={18} aria-hidden="true" />
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* Navigation */}
-          <div className="space-y-4">
-            <h4 className="text-sm font-semibold uppercase tracking-wider text-foreground">
-              Navegación
-            </h4>
-            <nav className="flex flex-col gap-3">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-
-          {/* Contact */}
-          <div className="space-y-4">
-            <h4 className="text-sm font-semibold uppercase tracking-wider text-foreground">
-              Contacto
-            </h4>
-            <div className="space-y-3 text-sm text-muted-foreground">
-              <p>Parada 8, Barra del Chuy</p>
-              <p>Rocha, Uruguay</p>
-              <a
-                href={`tel:+${WHATSAPP_NUMBER}`}
-                className="block hover:text-foreground"
-              >
-                +598 98 976 924
-              </a>
-            </div>
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="mt-12 border-t border-border pt-8">
-          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} Cabañas Parada 8. Todos los derechos
-              reservados.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Barra del Chuy, Uruguay
-            </p>
-          </div>
+        <nav aria-label="Pie de página">
+          <h4 className="mb-4 text-xs font-semibold text-white/45">Navegación</h4>
+          <ul className="grid grid-cols-2 gap-3">
+            {navLinks.map((l) => (
+              <li key={l.href}>
+                <a href={l.href} className="text-sm text-white/75 transition-colors hover:text-white">
+                  {l.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div>
+          <h4 className="mb-4 text-xs font-semibold text-white/45">Contacto</h4>
+          <ul className="space-y-3 text-sm text-white/75">
+            <li>Parada 8, Barra del Chuy</li>
+            <li>Rocha, Uruguay</li>
+            <li>
+              <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                WhatsApp {PHONE_DISPLAY}
+              </a>
+            </li>
+          </ul>
         </div>
       </div>
-    </motion.footer>
+      <p className="mx-auto max-w-7xl border-t border-white/10 px-4 py-6 text-xs text-white/45 lg:px-8">
+        © {new Date().getFullYear()} Cabañas Parada 8. Todos los derechos reservados.
+      </p>
+    </footer>
   );
 }

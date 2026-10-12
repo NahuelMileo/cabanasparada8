@@ -1,202 +1,151 @@
 "use client";
 
-import { SiFacebook, SiInstagram } from "react-icons/si";
-import Link from "next/link";
-import { Button } from "./ui/button";
+import { useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
-import { useState, useEffect } from "react";
-
-const WHATSAPP_NUMBER = "59898976924";
-const WHATSAPP_TEXT =
-  "Hola, me gustaría consultar disponibilidad y precios de Cabañas Parada 8. ¿Me podrás informar? Gracias.";
-const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-  WHATSAPP_TEXT
-)}`;
+import { gsap, getLenis } from "@/lib/motion";
+import { whatsappLink } from "@/lib/contact";
 
 const navLinks = [
-  { href: "#sobre", label: "Sobre Nosotros" },
+  { href: "#sobre", label: "Nosotros" },
   { href: "#cabanas", label: "Cabañas" },
   { href: "#servicios", label: "Servicios" },
+  { href: "#reservas", label: "Reservas" },
   { href: "#ubicacion", label: "Ubicación" },
 ];
 
+function Logo({ light }: { light: boolean }) {
+  return (
+    <a href="#inicio" className="flex items-center gap-2.5" aria-label="Cabañas Parada 8, inicio">
+      <span
+        className={`font-display flex h-10 w-9 flex-col items-center justify-center rounded-md leading-none transition-colors ${
+          light ? "bg-white text-bordo" : "bg-bordo text-white"
+        }`}
+      >
+        <span className="text-[8px] font-bold">Parada</span>
+        <span className="text-2xl font-extrabold">8</span>
+      </span>
+      <span className="font-display text-xl font-bold tracking-wide">Cabañas Parada 8</span>
+    </a>
+  );
+}
+
 export default function Nav() {
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  const barRef = useRef<HTMLSpanElement>(null);
 
-  // Prevent body scroll when menu is open
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    let hidden = false;
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      setScrolled(y > 60);
+      if (barRef.current) barRef.current.style.transform = `scaleX(${max > 0 ? y / max : 0})`;
+      const shouldHide = y > lastY && y > 500;
+      if (shouldHide !== hidden && headerRef.current) {
+        hidden = shouldHide;
+        gsap.to(headerRef.current, { yPercent: hidden ? -100 : 0, duration: 0.45, ease: "power3.out" });
+      }
+      lastY = y;
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const lenis = getLenis();
+    if (isOpen) lenis?.stop();
+    else lenis?.start();
+    document.body.style.overflow = isOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
   }, [isOpen]);
 
+  const solid = scrolled;
+
   return (
     <>
-      {/* Fullscreen Mobile Navigation - Outside header for proper stacking */}
       <div
-        className={`fixed inset-0 z-[60] bg-background transition-all duration-500 ease-out lg:hidden ${
-          isOpen 
-            ? "opacity-100 visible" 
-            : "opacity-0 invisible pointer-events-none"
+        className={`fixed inset-0 z-[60] flex flex-col bg-noche text-white transition-[opacity,visibility] duration-500 lg:hidden ${
+          isOpen ? "visible opacity-100" : "pointer-events-none invisible opacity-0"
         }`}
       >
-        {/* Close button inside fullscreen menu */}
-        <button
-          onClick={() => setIsOpen(false)}
-          className="absolute right-4 top-4 z-[70] rounded-md p-2 text-foreground"
-          aria-label="Cerrar menú"
-        >
-          <X size={28} />
-        </button>
-
-        <nav className="flex h-full flex-col items-center justify-center gap-2">
+        <div className="flex h-16 items-center justify-between px-4">
+          <Logo light />
+          <button onClick={() => setIsOpen(false)} className="rounded-md p-2" aria-label="Cerrar menú">
+            <X size={28} />
+          </button>
+        </div>
+        <nav className="flex flex-1 flex-col justify-center gap-1 px-6">
           {navLinks.map((link, index) => (
-            <Link
+            <a
               key={link.href}
               href={link.href}
               onClick={() => setIsOpen(false)}
-              className={`group relative overflow-hidden py-3 transition-all duration-500 ${
-                isOpen 
-                  ? "translate-y-0 opacity-100" 
-                  : "translate-y-8 opacity-0"
+              className={`font-display border-b border-white/15 py-3 text-5xl font-bold transition-all duration-500 ${
+                isOpen ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
               }`}
-              style={{ transitionDelay: isOpen ? `${index * 75 + 100}ms` : "0ms" }}
+              style={{ transitionDelay: isOpen ? `${index * 60 + 100}ms` : "0ms" }}
             >
-              <span className="font-serif text-4xl font-medium text-foreground transition-colors group-hover:text-primary sm:text-5xl">
-                {link.label}
-              </span>
-              <span className="absolute bottom-2 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full" />
-            </Link>
+              {link.label}
+            </a>
           ))}
-
-          {/* Social Links */}
-          <div 
-            className={`mt-8 flex items-center gap-4 transition-all duration-500 ${
-              isOpen 
-                ? "translate-y-0 opacity-100" 
-                : "translate-y-8 opacity-0"
-            }`}
-            style={{ transitionDelay: isOpen ? "400ms" : "0ms" }}
+          <a
+            href={whatsappLink()}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setIsOpen(false)}
+            className="mt-8 rounded-full bg-white px-6 py-4 text-center font-semibold text-bordo"
           >
-            <Link
-              href="https://www.facebook.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Facebook"
-              className="rounded-full border border-border p-3 text-muted-foreground transition-all hover:border-primary hover:bg-primary hover:text-primary-foreground"
-            >
-              <SiFacebook size={24} aria-hidden="true" />
-            </Link>
-            <Link
-              href="https://www.instagram.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Instagram"
-              className="rounded-full border border-border p-3 text-muted-foreground transition-all hover:border-primary hover:bg-primary hover:text-primary-foreground"
-            >
-              <SiInstagram size={24} aria-hidden="true" />
-            </Link>
-          </div>
-
-          {/* CTA Button */}
-          <div
-            className={`mt-6 transition-all duration-500 ${
-              isOpen 
-                ? "translate-y-0 opacity-100" 
-                : "translate-y-8 opacity-0"
-            }`}
-            style={{ transitionDelay: isOpen ? "475ms" : "0ms" }}
-          >
-            <Button
-              asChild
-              size="lg"
-              className="bg-primary px-10 py-6 text-lg font-medium hover:bg-primary/90"
-            >
-              <a
-                href={whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Reservar por WhatsApp"
-                onClick={() => setIsOpen(false)}
-              >
-                Reservar por WhatsApp
-              </a>
-            </Button>
-          </div>
+            Reservar por WhatsApp
+          </a>
         </nav>
       </div>
 
-      <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4 lg:px-8">
-          <Link href="#" className="flex items-center gap-3">
-            <span className="font-serif text-2xl font-semibold tracking-tight text-foreground">
-              Cabañas Parada 8
-            </span>
-          </Link>
+      <header
+        ref={headerRef}
+        className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
+          solid ? "bg-arena/95 text-noche shadow-[0_1px_0_rgba(0,0,0,0.06)] backdrop-blur" : "bg-transparent text-white"
+        }`}
+      >
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 lg:px-8">
+          <Logo light={!solid} />
 
-          {/* Desktop Navigation */}
-          <nav className="hidden items-center gap-8 lg:flex">
+          <nav className="hidden items-center gap-8 lg:flex" aria-label="Secciones">
             {navLinks.map((link) => (
-              <Link
+              <a
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                className="group relative text-sm font-semibold opacity-80 transition-opacity hover:opacity-100"
               >
                 {link.label}
-              </Link>
+                <span className="absolute -bottom-1 left-0 h-0.5 w-full origin-left scale-x-0 bg-bordo transition-transform duration-300 group-hover:scale-x-100" />
+              </a>
             ))}
           </nav>
 
-          <div className="hidden items-center gap-4 lg:flex">
-            <div className="flex items-center gap-2">
-              <Link
-                href="https://www.facebook.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook"
-                className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              >
-                <SiFacebook size={18} aria-hidden="true" />
-              </Link>
-              <Link
-                href="https://www.instagram.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              >
-                <SiInstagram size={18} aria-hidden="true" />
-              </Link>
-            </div>
-            <Button
-              asChild
-              className="bg-primary px-6 font-medium hover:bg-primary/90"
-            >
-              <a
-                href={whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Reservar por WhatsApp"
-              >
-                Reservar
-              </a>
-            </Button>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsOpen(true)}
-            className="rounded-md p-2 text-foreground lg:hidden"
-            aria-label="Abrir menú"
+          <a
+            href={whatsappLink()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden rounded-full bg-bordo px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-noche lg:inline-flex"
           >
-            <Menu size={24} />
+            Reservar
+          </a>
+
+          <button onClick={() => setIsOpen(true)} className="rounded-md p-2 lg:hidden" aria-label="Abrir menú">
+            <Menu size={26} />
           </button>
         </div>
+        <span
+          ref={barRef}
+          className="absolute bottom-0 left-0 h-[3px] w-full origin-left bg-bordo"
+          style={{ transform: "scaleX(0)" }}
+        />
       </header>
     </>
   );
